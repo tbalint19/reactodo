@@ -1,23 +1,79 @@
-import logo from './logo.svg';
 import './App.css';
+import { useState } from 'react';
 
-function App() {
+import Dashboard from './Components/Dashboard';
+import {
+  withSelectedDashboard,
+  withSelectedTodo,
+  withRenamedDashboard,
+  withNewDashboard,
+  withoutDashboard,
+  withNewTodo,
+  withoutTodo,
+  withModifiedTodo,
+} from './Producers/appStateProducers';
+
+const initialState = {
+  editedDashboardId: null,
+  editedTodoId: null,
+  dashboards: [ ]
+}
+
+const App = () => {
+
+  const [ appState, setAppState ] = useState(initialState)
+
+  const selectDashboard = (dashboardId) => {
+    setAppState(withSelectedDashboard(appState, dashboardId))
+  }
+
+  const renameDashboard = (dashboardId, newName) => {
+    setAppState(withRenamedDashboard(appState, dashboardId, newName))
+  }
+
+  const createDashboard = () => {
+    setAppState(withNewDashboard(appState))
+  }
+
+  const deleteDashboard = (dashboardId) => {
+    setAppState(withoutDashboard(appState, dashboardId))
+  }
+
+  const selectTodo = (todoId) => {
+    setAppState(withSelectedTodo(appState, todoId))
+  }
+
+  const createTodo = (dashboardId) => {
+    setAppState(withNewTodo(appState, dashboardId))
+  }
+
+  const deleteTodo = (todoId) => {
+    setAppState(withoutTodo(appState, todoId))
+  }
+
+  const modifyTodo = (todoId, newName, newDescription) => {
+    setAppState(withModifiedTodo(appState, todoId, newName, newDescription))
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      { appState.dashboards.map(dashboard => (
+        <div key={dashboard.id} className="Dashboard-container">
+          <Dashboard
+            dashboard={dashboard}
+            editedDashboardId={appState.editedDashboardId}
+            editedTodoId={appState.editedTodoId}
+            selectDashboard={selectDashboard}
+            renameDashboard={renameDashboard}
+            deleteDashboard={deleteDashboard}
+            selectTodo={selectTodo}
+            createTodo={createTodo}
+            deleteTodo={deleteTodo}
+            modifyTodo={modifyTodo}/>
+        </div>
+      )) }
+
+      <button onClick={createDashboard} id="newtodo">+</button>
     </div>
   );
 }
